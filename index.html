@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File & Folder Creator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
+      .button {
+        padding: 15px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .list-container {
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: left;
+      }
+      .item {
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .folder {
+        color: blue;
+        font-weight: bold;
+      }
+      .file {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Click to Create Folder or File</h1>
+    <div class="container">
+      <button class="button" onclick="createFolder()">📁 Create Folder</button>
+      <button class="button" onclick="createFile()">📄 Create File</button>
+    </div>
+
+    <h2>Stored Files & Folders:</h2>
+    <div class="list-container" id="fileList"></div>
+
+    <script>
+      async function createFolder() {
+        const response = await fetch("http://localhost:8888/create-folder", {
+          method: "POST",
+        });
+        const result = await response.json();
+        alert(result.message + ": " + result.folderName);
+      }
+
+      async function createFile() {
+        const response = await fetch("http://localhost:8888/create-file", {
+          method: "POST",
+        });
+        const result = await response.json();
+        alert(result.message + ": " + result.fileName);
+      }
+
+      async function fetchFilesAndFolders() {
+        const response = await fetch("http://localhost:8888/list");
+        const data = await response.json();
+
+        const fileList = document.getElementById("fileList");
+        fileList.innerHTML = ""; // Clear previous list
+
+        data.forEach((item) => {
+          const div = document.createElement("div");
+          div.className =
+            "item " + (item.type === "folder" ? "folder" : "file");
+          div.innerHTML =
+            item.type === "folder" ? `📁 ${item.name}` : `📄 ${item.name}`;
+          fileList.appendChild(div);
+        });
+      }
+
+      // Load list on page load
+      fetchFilesAndFolders();
+    </script>
+  </body>
+</html>
